@@ -2,7 +2,7 @@
 
 This Helm chart has been developed based on [bitnami/postgresql](https://github.com/bitnami/charts/tree/master/bitnami/postgresql) chart but including some changes to guarantee high availability such as:
 
-- A new deployment, service have been added to deploy [Pgpool-II](Pgpool-II) to act as proxy for PostgreSQL backend. It helps to reduce connection overhead, acts as a load balancer for PostgreSQL, and ensures database node failover.
+- A new deployment, service have been added to deploy [Pgpool-II](https://pgpool.net/mediawiki/index.php/Main_Page) to act as proxy for PostgreSQL backend. It helps to reduce connection overhead, acts as a load balancer for PostgreSQL, and ensures database node failover.
 - Replacing `bitnami/postgresql` with `bitnami/postgresql-repmgr` which includes and configures [repmgr](https://repmgr.org/). Repmgr ensures standby nodes assume the primary role when the primary node is unhealthy.
 
 ## TL;DR
@@ -14,7 +14,7 @@ $ helm install my-release bitnami/postgresql-ha
 
 ## Introduction
 
-This [Helm](https://github.com/kubernetes/helm) chart installs [PostgreSQL](https://www.postgresql.org/) with HA architecture in a Kubernetes cluster. Welcome to [contribute](CONTRIBUTING.md) to Helm Chart for PostgreSQL HA.
+This [Helm](https://github.com/kubernetes/helm) chart installs [PostgreSQL](https://www.postgresql.org/) with HA architecture in a Kubernetes cluster. Welcome to [contribute](https://github.com/bitnami/charts/blob/master/CONTRIBUTING.md) to Helm Chart for PostgreSQL HA.
 
 ## Prerequisites
 
@@ -97,6 +97,7 @@ Additionally, if `persistence.resourcePolicy` is set to `keep`, you should manua
 | `postgresql.podLabels`                          | Labels to add to the StatefulSet pods. Evaluated as template                                                                                                                                                  | `{}`                        |
 | `postgresql.replicaCount`                       | Number of replicas to deploy                                                                                                                                                                                  | `2`                         |
 | `postgresql.updateStrategyType`                 | Update strategy for PostgreSQL statefulset                                                                                                                                                                    | `RollingUpdate`             |
+| `postgresql.containerPort`                      | PostgreSQL port                                                                                                                                                                                               | `5432`                      |
 | `postgresql.hostAliases`                        | Deployment pod host aliases                                                                                                                                                                                   | `[]`                        |
 | `postgresql.podAnnotations`                     | Additional pod annotations                                                                                                                                                                                    | `{}`                        |
 | `postgresql.priorityClassName`                  | Pod priority class                                                                                                                                                                                            | `""`                        |
@@ -272,6 +273,7 @@ Additionally, if `persistence.resourcePolicy` is set to `keep`, you should manua
 | `pgpool.pdb.minAvailable`                   | Minimum number / percentage of pods that should remain scheduled                                                   | `1`                   |
 | `pgpool.pdb.maxUnavailable`                 | Maximum number / percentage of pods that may be made unavailable                                                   | `""`                  |
 | `pgpool.updateStrategy`                     | Strategy used to replace old Pods by new ones                                                                      | `{}`                  |
+| `pgpool.containerPort`                      | Pgpool port                                                                                                        | `5432`                |
 | `pgpool.minReadySeconds`                    | How many seconds a pod needs to be ready before killing the next, during update                                    | `""`                  |
 | `pgpool.adminUsername`                      | Pgpool Admin username                                                                                              | `admin`               |
 | `pgpool.adminPassword`                      | Pgpool Admin password                                                                                              | `""`                  |
@@ -333,6 +335,7 @@ Additionally, if `persistence.resourcePolicy` is set to `keep`, you should manua
 | `metrics.securityContext.runAsUser`          | User ID for the PostgreSQL Prometheus exporter container                                                                                                  | `1001`                      |
 | `metrics.resources.limits`                   | The resources limits for the container                                                                                                                    | `{}`                        |
 | `metrics.resources.requests`                 | The requested resources for the container                                                                                                                 | `{}`                        |
+| `metrics.containerPort`                      | Prometheus metrics exporter port                                                                                                                          | `9187`                      |
 | `metrics.livenessProbe.enabled`              | Enable livenessProbe                                                                                                                                      | `true`                      |
 | `metrics.livenessProbe.initialDelaySeconds`  | Initial delay seconds for livenessProbe                                                                                                                   | `30`                        |
 | `metrics.livenessProbe.periodSeconds`        | Period seconds for livenessProbe                                                                                                                          | `10`                        |
@@ -482,7 +485,7 @@ You can enable this initContainer by setting `volumePermissions.enabled` to `tru
 
 ### Securing traffic using TLS
 
-Learn how to [configure TLS authentication](/<%= platform_path %>/infrastructure/postgresql-ha/administration/enable-tls/)
+Learn how to [configure TLS authentication](/<%= platform_path %>/infrastructure/postgresql-ha/administration/enable-tls-ingress/)
 
 ### LDAP
 
@@ -514,7 +517,7 @@ ldap.tls_reqcert="demand"
 
 Next, login to the PostgreSQL server using the `psql` client and add the PAM authenticated LDAP users.
 
-> Note: Parameters including commas must be escaped as shown in the above example. More information at: https://github.com/helm/helm/blob/master/docs/using_helm.md#the-format-and-limitations-of---set
+> Note: Parameters including commas must be escaped as shown in the above example.
 
 ### repmgr.conf / postgresql.conf / pg_hba.conf / pgpool.conf files as configMap
 
